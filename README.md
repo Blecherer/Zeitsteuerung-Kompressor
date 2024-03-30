@@ -6,3 +6,8 @@ Zeitsteuerung für Kompressor:
 -   Webserver
 
 Kompressor nur nutzbar an Werktagen zwischen 8 und 21 Uhr.
+
+
+fehlt noch:
+-   Sommer/Winterzeit
+-   Feiertage

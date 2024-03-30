@@ -81,16 +81,40 @@ void disablePowerOn()
   analogWrite(LEDgruen, dunkel);
 }
 
-void enablePowerOn()
+bool istFeiertag()
 {
-  // schalte Relay 2 ein
-  digitalWrite(Relay2, HIGH); // An dieser Stelle würde das Relais 2 einschalten
-  digitalWrite(Relay1, LOW);  // An dieser Stelle würde das Relais 1 ausschalten
-  // schalte LED auf grün
-  analogWrite(LEDgruen, brightness1);
-  analogWrite(LEDrot, dunkel);
+  DateTime _datum = rtc.now();
+  bool success = false;
+
+  return success;
 }
 
+bool istEinschaltenErlaubt()
+{
+  bool success = false;
+
+  // check Wochentag unf Feiertag
+  int dayofweek = rtc.now().dayOfTheWeek();
+  if (dayofweek != 0 && !istFeiertag())
+  {
+    success = true;
+  }
+
+  return success;
+}
+
+void enablePowerOn()
+{
+  if (istEinschaltenErlaubt())
+  {
+    // schalte Relay 2 ein
+    digitalWrite(Relay2, HIGH); // An dieser Stelle würde das Relais 2 einschalten
+    digitalWrite(Relay1, LOW);  // An dieser Stelle würde das Relais 1 ausschalten
+    // schalte LED auf grün
+    analogWrite(LEDgruen, brightness1);
+    analogWrite(LEDrot, dunkel);
+  }
+}
 void setup()
 {
   Serial.begin(115200);
