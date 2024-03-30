@@ -1,20 +1,43 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ArduinoOTA.h>
-
+#include "DCF77.h"
+#include "TimeLib.h"
 
 
 // variables for measured values
 int NumberClients;
-
+const int led = 13;
 
 // put function declarations here:
 int myFunction(int, int);
 
 // create web server
 ESP8266WebServer webServer(80);
+
+void handleRoot() {
+  // digitalWrite(led, 1);
+  webServer.send(200, "text/plain", "hello from esp8266!");
+  // digitalWrite(led, 0);
+}
+
+void handleNotFound(){
+  // digitalWrite(led, 1);
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += webServer.uri();
+  message += "\nMethod: ";
+  message += (webServer.method() == HTTP_GET)?"GET":"POST";
+  message += "\nArguments: ";
+  message += webServer.args();
+  message += "\n";
+  for (uint8_t i=0; i<webServer.args(); i++){
+    message += " " + webServer.argName(i) + ": " + webServer.arg(i) + "\n";
+  }
+  webServer.send(404, "text/plain", message);
+  // digitalWrite(led, 0);
+}
 
 void setup() {
   Serial.begin(115200);
@@ -29,62 +52,20 @@ void setup() {
   }
   Serial.print("erfolgreich aufgebaut!");
 
+  webServer.on("/", handleRoot);
 
-  ArduinoOTA.onStart([]() {
-    //save();                       //Einkommentieren wenn Werte vor dem Update gesichert werden sollen
+  webServer.on("/inline", [](){
+    webServer.send(200, "text/plain", "this works as well");
   });
-  ArduinoOTA.begin();
 
-
-  webServer.on("/", handle_OnConnect);
-  webServer.onNotFound(handle_NotFound);
+  webServer.onNotFound(handleNotFound);
 
   webServer.begin();
   Serial.println("HTTP server started");
+
 }
 
 void loop() {
   NumberClients = WiFi.softAPgetStationNum();
-  delay(3000);
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
-
-void handle_OnConnect() {
-  //temperature = dht.readTemperature();
-  //humidity = dht.readHumidity();
-  webServer.send(200, "text/html", buildHtml( ));
-}
-
-void handle_NotFound(){
-  webServer.send(404, "text/plain", "Not found");
-}
-
-String buildHtml(int _NumberClients){
-  String page = "<!DOCTYPE html> <html>\n";
-  page +="<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\"/>\n";
-  page +="<meta charset=\"UTF-8\"/>";
-  page +="<meta http-equiv=\"refresh\" content=\"5\"/>";
-  page +="<title>WeMos D1 mini Temperature & Humidity Report</title>\n";
-  page +="<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
-  page +="body{margin-top: 50px;} h1 {color: #444444;margin: 20px auto 30px;}\n";
-  page +="h2 {color: #0d4c75;margin: 50px auto 20px;}\n";
-  page +="p {font-size: 24px;color: #444444;margin-bottom: 10px;}\n";
-  page +="</style>\n";
-  page +="</head>\n";
-  page +="<body>\n";
-  page +="<div id=\"webpage\">\n";
-  page +="<h2>WeMos Lolin D1 mini</h2><h1>Anzahl Clients Report</h1>\n";
- 
-  page +="<p>Anzahl der Clients: ";
-  page +=(int)_NumberClients;
-  page +=" °C</p>";
-   
-  page +="</div>\n";
-  page +="</body>\n";
-  page +="</html>\n";
-  return page;
+  webServer.handleClient();
 }
