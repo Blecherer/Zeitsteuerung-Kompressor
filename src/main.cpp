@@ -2,6 +2,8 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <ArduinoOTA.h>
+
 
 
 // variables for measured values
@@ -26,6 +28,13 @@ void setup() {
     Serial.println("NICHT ");
   }
   Serial.print("erfolgreich aufgebaut!");
+
+
+  ArduinoOTA.onStart([]() {
+    //save();                       //Einkommentieren wenn Werte vor dem Update gesichert werden sollen
+  });
+  ArduinoOTA.begin();
+
 
   webServer.on("/", handle_OnConnect);
   webServer.onNotFound(handle_NotFound);
