@@ -2,13 +2,10 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ArduinoOTA.h>
-#include "DCF77.h"
-#include "TimeLib.h"
 
 
 // variables for measured values
 int NumberClients;
-const int led = 13;
 
 // put function declarations here:
 int myFunction(int, int);
