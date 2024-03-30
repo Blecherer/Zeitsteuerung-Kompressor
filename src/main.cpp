@@ -71,7 +71,7 @@ void setup()
   webServer.on("/", handleRoot);
 
   webServer.on("/inline", []()
-               { webServer.send(200, "text/plain", "this works as well"); });
+  { webServer.send(200, "text/plain", "this works as well"); });
 
   webServer.onNotFound(handleNotFound);
 
