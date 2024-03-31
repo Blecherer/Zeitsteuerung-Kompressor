@@ -5,6 +5,8 @@
 #include "RTClib.h"
 #include <SPI.h>
 
+
+
 // variables for measured values
 int NumberClients;
 int LEDrot = D5;       // Farbe rot an Pin 5
