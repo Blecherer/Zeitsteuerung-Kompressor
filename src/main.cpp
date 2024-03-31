@@ -57,6 +57,7 @@ void printTime()
   Serial.println(date);
 }
 
+/// @brief setzte die Alarmzeit auf 8 und 21 Uhr
 void setAlarm()
 {
   int year = rtc.now().year();
@@ -71,6 +72,7 @@ void setAlarm()
   rtc.setAlarm2(alarmTime2, DS3231_A2_Hour);
 }
 
+/// @brief ausschalten des Kompressors
 void disablePowerOn()
 {
   // schalte Relay 1 ein
@@ -81,6 +83,7 @@ void disablePowerOn()
   analogWrite(LEDgruen, dunkel);
 }
 
+/// @brief ist heute ein Feiertag?
 bool istFeiertag()
 {
   DateTime _datum = rtc.now();
@@ -89,11 +92,11 @@ bool istFeiertag()
   return success;
 }
 
+/// @brief check Wochentag und Feiertag
 bool istEinschaltenErlaubt()
 {
   bool success = false;
 
-  // check Wochentag unf Feiertag
   int dayofweek = rtc.now().dayOfTheWeek();
   if (dayofweek != 0 && !istFeiertag())
   {
@@ -103,6 +106,7 @@ bool istEinschaltenErlaubt()
   return success;
 }
 
+/// @brief gibt den Einschaltknopf des Kompressors frei
 void enablePowerOn()
 {
   if (istEinschaltenErlaubt())
@@ -115,6 +119,23 @@ void enablePowerOn()
     analogWrite(LEDrot, dunkel);
   }
 }
+
+/// @brief führe Umstellung Sommer/Winterzeit durch
+int summertime_EU(int year, byte month, byte day, byte hour, byte tzHours)
+{
+  int _Zeit = 0;
+  if ((month == 3 && (hour + 24 * day)) >= (1 + tzHours + 24 * (31 - (5 * year / 4 + 4) % 7)))
+  {
+    _Zeit = 1;
+  }
+  if ((month == 10 && (hour + 24 * day)) < (1 + tzHours + 24 * (31 - (5 * year / 4 + 1) % 7)))
+  {
+    _Zeit = -1;
+  }
+
+  return _Zeit;
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -196,6 +217,12 @@ void loop()
   if (stunde0 == now.hour() and stunde0 == now.minute())
   {
     setAlarm();
+    int zeitfaktorZeitumstellung = summertime_EU(now.year(), now.month(), now.day(), now.hour(), 1);
+    if (zeitfaktorZeitumstellung != 0)
+    {
+      // setze neue Uhrzeit
+      rtc.adjust(DateTime(now.year(), now.month(), now.day(), now.hour() + zeitfaktorZeitumstellung, 0, 0)); // J, M, T, Std, Min, Sek
+    }
   }
 
   // resetting SQW and alarm 1 flag
