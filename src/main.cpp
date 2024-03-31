@@ -7,12 +7,11 @@
 
 // variables for measured values
 int NumberClients;
-char wochentage[7][12] = {"Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"};
-const char *monthName[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 int LEDrot = D5;       // Farbe rot an Pin 5
 int LEDgruen = D6;     // Farbe gruen an Pin 6
 int dunkel = 0;        // Zahlenwert 0 bedeutet Spannung 0V – also LED aus
 int brightness1 = 150; // Zahlenwert zwischen 0 und 255 – gibt die Leuchtstärke der einzelnen Farbe an
+const char *feiertage[11] = {"01.01.2024", "29.03.2024", "01.04.2024", "01.05.2024", "09.05.2024", "20.05.2024", "30.05.2024", "03.10.2024", "01.11.2024", "25.12.2024", "26.12.2024"};
 
 int Relay1 = D2;
 int Relay2 = D3;
@@ -86,10 +85,16 @@ void disablePowerOn()
 /// @brief ist heute ein Feiertag?
 bool istFeiertag()
 {
-  DateTime _datum = rtc.now();
-  bool success = false;
+  DateTime now = rtc.now();
+  char buf4[] = "DD.MM.YYYY";
+  char *datum = now.toString(buf4);
+  for (int i = 0; i < 11; i++)
+  {
+    if (feiertage[i] == datum)
+      return true;
+  }
 
-  return success;
+return false;
 }
 
 /// @brief check Wochentag und Feiertag
