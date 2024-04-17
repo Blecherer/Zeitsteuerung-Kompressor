@@ -1,5 +1,5 @@
 Zeitsteuerung für Kompressor:
--  D1 Mini 286
+-  NodeMCU ESP8266
 -  DS3231 RTC
 -  2 Relays
 -  1 RGB LED
