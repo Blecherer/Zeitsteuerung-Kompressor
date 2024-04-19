@@ -147,6 +147,8 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println();
+  Wire.begin(); // Start the I2C
+
 
   if (!rtc.begin())
   {
