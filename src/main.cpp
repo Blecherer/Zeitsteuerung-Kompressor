@@ -5,6 +5,8 @@
 #include "RTClib.h"
 #include <SPI.h>
 
+
+
 // variables for measured values
 int NumberClients;
 int LEDrot = D5;       // Farbe rot an Pin 5
@@ -94,7 +96,7 @@ bool istFeiertag()
       return true;
   }
 
-  return false;
+return false;
 }
 
 /// @brief check Wochentag und Feiertag
@@ -143,17 +145,20 @@ int summertime_EU(int year, byte month, byte day, byte hour, byte tzHours)
 
 void setup()
 {
-  Serial.begin(57600);
+  Serial.begin(115200);
   Serial.println();
-  Wire.begin(); // Start the I2C
-  rtc.begin();  // Init RTC
 
-  //rtc.adjust(DateTime(2024, 4, 19, 15, 40, 0));
+  if (!rtc.begin())
+  {
+    Serial.println("Couldn't find RTC");
+    while (1)
+      ;
+  }
 
   // we don't need the 32K Pin, so disable it
   rtc.disable32K();
 
-  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));  // Zeit vom Compiler
+  // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));  // Zeit vom Compiler
   // rtc.adjust(DateTime(2022, 11, 21, 13, 0, 0)); // J, M, T, Std, Min, Sek
 
   // set alarm 1, 2 flag to false (so alarm 1, 2 didn't happen so far)
@@ -196,14 +201,10 @@ void setup()
   // Ausgang RGB LED
   pinMode(LEDgruen, OUTPUT);
   pinMode(LEDrot, OUTPUT);
-
-  delay(3000);
 }
 
 void loop()
 {
-  delay(3000);
-
   NumberClients = WiFi.softAPgetStationNum();
   webServer.handleClient();
 
